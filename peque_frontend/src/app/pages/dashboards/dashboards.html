@@ -1,0 +1,198 @@
+<div class="dash-container">
+
+  <div class="dash-header">
+    <h2><i class="bi bi-bar-chart-fill me-2"></i>Reportes</h2>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-indigo">
+      <div class="kpi-icono"><i class="bi bi-receipt"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-valor">{{ resumen.totalVentas }}</span>
+        <span class="kpi-label">Ventas totales</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-esmeralda">
+      <div class="kpi-icono"><i class="bi bi-cash-stack"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-valor">S/ {{ resumen.totalIngresos | number:'1.2-2' }}</span>
+        <span class="kpi-label">Ingresos totales</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-ambar">
+      <div class="kpi-icono"><i class="bi bi-ticket-perforated"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-valor">S/ {{ resumen.ticketPromedio | number:'1.2-2' }}</span>
+        <span class="kpi-label">Ticket promedio</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-cielo">
+      <div class="kpi-icono"><i class="bi bi-calendar-check"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-valor">{{ resumen.ventasHoy }} <small>(S/ {{ resumen.ingresosHoy | number:'1.2-2' }})</small></span>
+        <span class="kpi-label">Ventas de hoy</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-violeta">
+      <div class="kpi-icono"><i class="bi bi-people"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-valor">{{ resumen.vendedoresActivos }}</span>
+        <span class="kpi-label">Vendedores activos</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="seccion-tabs">
+    <button *ngFor="let s of secciones" class="tab-btn" [class.active]="seccionActiva === s.id"
+      (click)="seleccionarSeccion(s.id)">
+      <i class="bi {{ s.icono }}"></i> {{ s.nombre }}
+    </button>
+  </div>
+
+  <div class="dash-body">
+
+    <div class="chart-card" *ngIf="seccionActiva === 'ventas'">
+      <div class="chart-header">
+        <div>
+          <h5>Evolución de ventas</h5>
+          <p class="chart-sub">Cantidad de ventas y monto recaudado por {{ periodo === 'dia' ? 'hora (hoy)' : periodo === 'semana' ? 'día (esta semana)' : 'día del mes' }}</p>
+        </div>
+        <div class="chart-filtros">
+          <select [(ngModel)]="periodo" (ngModelChange)="cargarVentas()">
+            <option value="dia">Hoy</option>
+            <option value="semana">Esta semana</option>
+            <option value="mes">Por mes</option>
+          </select>
+          <select *ngIf="periodo === 'mes'" [(ngModel)]="mesSeleccionado" (ngModelChange)="cargarVentas()">
+            <option *ngFor="let m of meses" [ngValue]="m.value">{{ m.nombre }}</option>
+          </select>
+          <select *ngIf="periodo === 'mes'" [(ngModel)]="anioSeleccionado" (ngModelChange)="cargarVentas()">
+            <option *ngFor="let a of anios" [ngValue]="a">{{ a }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="chartVentas"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card" *ngIf="seccionActiva === 'productos'">
+      <div class="chart-header">
+        <div>
+          <h5>Productos más vendidos</h5>
+          <p class="chart-sub">Top 8 por unidades vendidas (histórico, sin ventas anuladas)</p>
+        </div>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="chartProductos"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card" *ngIf="seccionActiva === 'horaPunta'">
+      <div class="chart-header">
+        <div>
+          <h5>Hora punta</h5>
+          <p class="chart-sub">{{ horaPuntaResumen }}</p>
+        </div>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="chartHoraPunta"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card" *ngIf="seccionActiva === 'vendedores'">
+      <div class="chart-header">
+        <div>
+          <h5>Mejores vendedores</h5>
+          <p class="chart-sub">Ranking por monto vendido</p>
+        </div>
+      </div>
+      <div class="vendedores-grid">
+        <div class="ranking-lista" *ngIf="topVendedores.length > 0">
+          <div class="ranking-item" *ngFor="let v of topVendedores; let i = index">
+            <span class="ranking-pos" [class.oro]="i === 0" [class.plata]="i === 1" [class.bronce]="i === 2">{{ i + 1 }}</span>
+            <span class="ranking-nombre">{{ v.nombre }}</span>
+            <span class="ranking-dato">{{ v.ventas }} ventas</span>
+            <span class="ranking-monto">S/ {{ v.monto | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="chartVendedores"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-doble" *ngIf="seccionActiva === 'pagos'">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <h5>Métodos de pago</h5>
+            <p class="chart-sub">Distribución de ventas por método</p>
+          </div>
+        </div>
+        <div class="chart-wrapper chart-dona">
+          <canvas id="chartMetodos"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <h5>Tipo de comprobante</h5>
+            <p class="chart-sub">Boletas vs facturas emitidas</p>
+          </div>
+        </div>
+        <div class="chart-wrapper chart-dona">
+          <canvas id="chartComprobantes"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card asesor-card" *ngIf="seccionActiva === 'asesor'">
+      <div class="chart-header">
+        <div>
+          <h5><i class="bi bi-robot me-2"></i>Asesor con IA</h5>
+          <p class="chart-sub">Recomendaciones para aumentar mejorar las ventas, generadas a partir de los reportes</p>
+        </div>
+        <button class="btn-asesor" (click)="generarAsesor()" [disabled]="asesorCargando">
+          <i class="bi bi-stars"></i>
+          {{ asesorCargando ? 'Generando...' : (asesorGenerado ? 'Volver a generar' : 'Generar recomendaciones') }}
+        </button>
+      </div>
+
+      <div class="asesor-loading" *ngIf="asesorCargando">
+        <div class="spinner"></div>
+        <span>Analizando reportes...</span>
+      </div>
+
+      <div class="asesor-error" *ngIf="asesorError && !asesorCargando">
+        <i class="bi bi-exclamation-triangle"></i> {{ asesorError }}
+      </div>
+
+      <div class="asesor-vacio" *ngIf="!asesorGenerado && !asesorCargando && !asesorError">
+        <i class="bi bi-robot"></i>
+        <p>Pulsa "Generar recomendaciones" para recibir consejos personalizados basados en tus ventas.</p>
+      </div>
+
+      <div class="asesor-resultado" *ngIf="asesorGenerado && !asesorCargando && !asesorError">
+        <p class="asesor-resumen" *ngIf="asesorResumen">{{ asesorResumen }}</p>
+        <div class="asesor-lista">
+          <div class="asesor-item" *ngFor="let r of asesorRecomendaciones">
+            <div class="asesor-item-head">
+              <span class="asesor-titulo">{{ r.titulo }}</span>
+              <span class="asesor-impacto" [class.impacto-alto]="r.impacto === 'alto'"
+                [class.impacto-medio]="r.impacto === 'medio'" [class.impacto-bajo]="r.impacto === 'bajo'">
+                {{ r.impacto }}
+              </span>
+            </div>
+            <p class="asesor-detalle">{{ r.detalle }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-cargando" *ngIf="cargando">
+      <div class="spinner"></div>
+    </div>
+
+  </div>
+</div>

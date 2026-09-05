@@ -1,0 +1,122 @@
+<div class="movimientos-container">
+
+  <div class="mov-header">
+    <h2 class="mov-title">Historial de Movimientos</h2>
+    <span class="mov-subtitle">Módulo de Auditoría de Ventas</span>
+  </div>
+
+  <div class="mov-toolbar">
+    <div class="toolbar-left">
+      <input type="text" class="mov-input" placeholder="Buscar por ID de Venta, Usuario u Observación..."
+        [(ngModel)]="filtro" (ngModelChange)="aplicarFiltros()" />
+      <input type="date" class="mov-input mov-input-date" [(ngModel)]="filtroFecha"
+        (ngModelChange)="aplicarFiltros()" />
+      <button class="btn-filtrar" (click)="aplicarFiltros()">Filtrar Historial</button>
+      <button class="btn-limpiar" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </div>
+
+  <div class="mov-table-wrapper">
+    <div *ngIf="cargando" class="mov-loading">Cargando movimientos...</div>
+
+    <table *ngIf="!cargando" class="mov-table">
+      <thead>
+        <tr>
+          <th>ID Mov.</th>
+          <th>ID Venta</th>
+          <th>Estado Anterior</th>
+          <th>Estado Nuevo</th>
+          <th>Fecha y Hora</th>
+          <th>Usuario Responsable</th>
+          <th>Observación</th>
+          <th class="col-descarga">Comprobante</th>
+          <th class="col-descarga">Nota Crédito</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mov of movimientosFiltrados"
+          [class.fila-seleccionada]="movimientoSeleccionado?.idMovimiento === mov.idMovimiento"
+          (click)="seleccionarMovimiento(mov)">
+          <td>{{ formatearId(mov.idMovimiento) }}</td>
+          <td class="id-venta">#{{ formatearId(mov.idVenta) }}</td>
+          <td>
+            <span *ngIf="mov.estadoAnterior; else sinEstado" [class]="'badge ' + getEstadoClass(mov.estadoAnterior)">
+              {{ mov.estadoAnterior }}
+            </span>
+            <ng-template #sinEstado><span class="badge badge-default">—</span></ng-template>
+          </td>
+          <td>
+            <span [class]="'badge ' + getEstadoClass(mov.estadoNuevo)">{{ mov.estadoNuevo }}</span>
+          </td>
+          <td>{{ formatearFecha(mov.fechaMovimiento) }}</td>
+          <td>{{ mov.usuarioResponsable }}</td>
+          <td class="col-observacion">{{ mov.observacion || '—' }}</td>
+          <td class="col-descarga">
+            <button class="btn-descarga btn-comprobante"
+              title="Descargar {{ mov.tipoComprobante === 'FACTURA' ? 'Factura' : 'Boleta' }}"
+              (click)="descargarComprobante(mov.idVenta, $event)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              {{ mov.tipoComprobante === 'FACTURA' ? 'Factura' : 'Boleta' }}
+            </button>
+          </td>
+          <td class="col-descarga">
+            <button *ngIf="mov.tieneNotaCredito" class="btn-descarga btn-nota" title="Descargar Nota de Crédito"
+              (click)="descargarNotaCredito(mov.idNotaCredito, $event)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              NC
+            </button>
+            <span *ngIf="!mov.tieneNotaCredito" class="sin-nc">—</span>
+          </td>
+        </tr>
+        <tr *ngIf="movimientosFiltrados.length === 0">
+          <td colspan="9" class="sin-resultados">No se encontraron movimientos</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mov-footer">
+    <div class="footer-actions">
+      <button class="btn-anular" [disabled]="!puedeAnular() || procesando" (click)="abrirModalAnular()">
+        Anular Venta
+      </button>
+      <button class="btn-deshacer" [disabled]="!puedeDeshacer() || procesando" (click)="deshacerAnulacion()">
+        <i class="bi bi-arrow-counterclockwise"></i> Deshacer Anulación
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarModalAnular" (click)="cerrarModalAnular()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Anular Venta #{{ movimientoSeleccionado?.idVenta }}</h3>
+      <button class="modal-close" (click)="cerrarModalAnular()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-warning">
+        Esta acción anulará la venta y generará automáticamente una nota de crédito.
+      </p>
+      <label class="modal-label">Motivo de anulación <span class="required">*</span></label>
+      <textarea class="modal-textarea" rows="3" placeholder="Motivo de anulación"
+        [(ngModel)]="motivoAnulacion"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar-modal" (click)="cerrarModalAnular()">Cancelar</button>
+      <button class="btn-confirmar-anular" [disabled]="procesando" (click)="confirmarAnulacion()">
+        {{ procesando ? 'Procesando...' : 'Confirmar Anulación' }}
+      </button>
+    </div>
+  </div>
+</div>

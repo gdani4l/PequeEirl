@@ -1,0 +1,85 @@
+<div class="mis-container">
+
+  <div class="mis-header">
+    <h2 class="mis-title"><i class="bi bi-bag-check me-2"></i>Mis Ventas</h2>
+    <span class="mis-subtitle">Historial y comprobantes de las ventas que realizaste</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icono verde"><i class="bi bi-receipt"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-valor">{{ resumen.totalVentas }}</span>
+        <span class="kpi-label">Ventas realizadas</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icono azul"><i class="bi bi-cash-coin"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-valor">S/ {{ resumen.totalIngresos | number:'1.2-2' }}</span>
+        <span class="kpi-label">Ingresos generados</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icono ambar"><i class="bi bi-ticket-perforated"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-valor">S/ {{ resumen.ticketPromedio | number:'1.2-2' }}</span>
+        <span class="kpi-label">Ticket promedio</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icono cielo"><i class="bi bi-calendar-check"></i></div>
+      <div class="kpi-info">
+        <span class="kpi-valor">{{ resumen.ventasHoy }} <small>(S/ {{ resumen.ingresosHoy | number:'1.2-2' }})</small></span>
+        <span class="kpi-label">Ventas de hoy</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mis-toolbar">
+    <input type="text" class="mis-input" placeholder="Buscar por comprobante, cliente o N° de venta..."
+      [(ngModel)]="filtro" (ngModelChange)="aplicarFiltros()" />
+    <input type="date" class="mis-input mis-input-date" [(ngModel)]="filtroFecha"
+      (ngModelChange)="aplicarFiltros()" />
+    <button class="btn-limpiar" (click)="limpiarFiltros()">Limpiar</button>
+  </div>
+
+  <div class="mis-table-wrapper">
+    <div *ngIf="cargando" class="mis-loading">Cargando tus ventas...</div>
+
+    <table *ngIf="!cargando" class="mis-table">
+      <thead>
+        <tr>
+          <th>Comprobante</th>
+          <th>Fecha y Hora</th>
+          <th>Tipo</th>
+          <th>Método</th>
+          <th>Cliente</th>
+          <th>Estado</th>
+          <th class="col-monto">Total</th>
+          <th class="col-descarga">Boleta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let v of ventasFiltradas">
+          <td class="comprobante">{{ v.comprobante }}</td>
+          <td>{{ v.fecha | date:'dd/MM/yyyy, hh:mm a' }}</td>
+          <td>{{ v.tipoComprobante }}</td>
+          <td>{{ v.metodoPago }}</td>
+          <td class="cliente">{{ v.cliente }}</td>
+          <td><span [class]="'badge ' + getEstadoClass(v.estado)">{{ v.estado }}</span></td>
+          <td class="col-monto monto">S/ {{ v.total | number:'1.2-2' }}</td>
+          <td class="col-descarga">
+            <button class="btn-descarga" title="Descargar comprobante" (click)="descargarBoleta(v.idVenta, $event)">
+              <i class="bi bi-download"></i> {{ v.tipoComprobante === 'FACTURA' ? 'Factura' : 'Boleta' }}
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="ventasFiltradas.length === 0">
+          <td colspan="8" class="sin-resultados">No tienes ventas registradas</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

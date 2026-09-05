@@ -1,0 +1,18 @@
+<div class="alert-overlay" *ngIf="visible" (click)="cerrar()">
+    <div class="alert-container" [ngClass]="'alert-' + tipo" (click)="$event.stopPropagation()">
+        <div class="alert-icon">
+            <i class="bi" [ngClass]="{
+                'bi-check-circle-fill': tipo === 'success',
+                'bi-exclamation-triangle-fill': tipo === 'error',
+                'bi-info-circle-fill': tipo === 'info',
+                'bi-exclamation-diamond-fill': tipo === 'warning'
+            }"></i>
+        </div>
+        <div class="alert-content">
+            <p class="alert-message">{{ mensaje }}</p>
+        </div>
+        <button class="alert-close" (click)="cerrar()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+</div>

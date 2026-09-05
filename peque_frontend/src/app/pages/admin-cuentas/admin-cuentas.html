@@ -1,0 +1,212 @@
+<div class="admin-cuentas-container">
+    <div class="admin-header">
+        <h2><i class="bi bi-people-fill"></i>Panel de Administración de Usuarios</h2>
+        <p>Gestión de todos los usuarios del sistema</p>
+    </div>
+
+    <div class="admin-card">
+        <div class="admin-card-body">
+            <div *ngIf="!editando">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Rol</th>
+                                <th>Nombre</th>
+                                <th>Apellido Paterno</th>
+                                <th>Apellido Materno</th>
+                                <th>Correo</th>
+                                <th>N° Documento</th>
+                                <th>Estado</th>
+                                <th>Editar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let user of usuarios">
+                                <td>{{ user.id_usuario }}</td>
+                                <td><span class="badge" [class.bg-primary]="user.rol_nombre === 'ADMIN'"
+                                        [class.bg-secondary]="user.rol_nombre === 'VENDEDOR'">{{ user.rol_nombre
+                                        }}</span></td>
+                                <td>{{ user.nombre }}</td>
+                                <td>{{ user.apellido_pat }}</td>
+                                <td>{{ user.apellido_mat }}</td>
+                                <td>{{ user.correo }}</td>
+                                <td>{{ user.numero_documento }}</td>
+                                <td>
+                                    <span class="badge" [class.bg-success]="user.activo"
+                                        [class.bg-danger]="!user.activo">
+                                        {{ user.activo ? 'ACTIVO' : 'INACTIVO' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" (click)="seleccionarUsuario(user)">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="usuarios.length === 0">
+                                <td colspan="9" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox"></i> No hay usuarios registrados
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div *ngIf="editando">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="section-title mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>Editando usuario: {{ usuario.nombre }} {{
+                        usuario.apellido_pat }}
+                    </h5>
+                    <button class="btn btn-secondary btn-sm" (click)="cancelarEdicion()">
+                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                    </button>
+                </div>
+
+                <hr>
+
+                <form (ngSubmit)="actualizarUsuario()">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="section-title"><i class="bi bi-person-badge me-2"></i>Información Personal</h6>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Primer Nombre *</label>
+                                    <input type="text" class="form-control" [(ngModel)]="usuario.nombre" name="nombre"
+                                    placeholder="Buscar por DNI" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Segundo Nombre</label>
+                                    <input type="text" class="form-control" [(ngModel)]="usuario.segundo_nombre"
+                                        name="segundo_nombre" placeholder="Buscar por DNI" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Apellido Paterno *</label>
+                                    <input type="text" class="form-control" [(ngModel)]="usuario.apellido_pat"
+                                        name="apellido_pat" placeholder="Buscar por DNI" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Apellido Materno *</label>
+                                    <input type="text" class="form-control" [(ngModel)]="usuario.apellido_mat"
+                                        name="apellido_mat" placeholder="Buscar por DNI" readonly>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Número de Documento *</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" [(ngModel)]="usuario.numero_documento"
+                                            name="numero_documento" (input)="restringirDni()" inputmode="numeric"
+                                            maxlength="8" placeholder="Número de Documento">
+                                        <button type="button" class="btn btn-primary" (click)="buscarDni()"
+                                            [disabled]="buscando">
+                                            <i class="bi bi-search"></i> Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Correo Electrónico *</label>
+                                    <input type="email" class="form-control" [(ngModel)]="usuario.correo" name="correo"
+                                        placeholder="Correo Electrónico">
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Rol de Usuario *</label>
+                                    <select class="form-control" [(ngModel)]="usuario.rol" name="rol">
+                                        <option value="">Seleccione un rol</option>
+                                        <option value="ADMIN">Administrador</option>
+                                        <option value="VENDEDOR">Vendedor</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Teléfono *</label>
+                                    <input type="tel" class="form-control" [(ngModel)]="usuario.telefono"
+                                        name="telefono" (input)="restringirTelefono()" inputmode="numeric"
+                                        maxlength="9" placeholder="Teléfono">
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Estado</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" [(ngModel)]="usuario.activo"
+                                                [value]="true" name="activo" id="activo">
+                                            <label class="form-check-label" for="activo">ACTIVO</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" [(ngModel)]="usuario.activo"
+                                                [value]="false" name="activo" id="inactivo">
+                                            <label class="form-check-label" for="inactivo">INACTIVO</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="section-title"><i class="bi bi-geo-alt-fill me-2"></i>Localización y Domicilio
+                            </h6>
+
+                            <div class="mb-3">
+                                <label class="form-label">Ubigeo</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" [(ngModel)]="usuario.codigo_ubigeo"
+                                        name="codigo_ubigeo" (input)="restringirUbigeo()" inputmode="numeric"
+                                        maxlength="6" placeholder="Ubigeo">
+                                    <button type="button" class="btn btn-primary" (click)="buscarUbigeo()">
+                                        <i class="bi bi-search"></i> Buscar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Departamento *</label>
+                                <select class="form-control" [(ngModel)]="usuario.departamentoCode" name="departamentoCode"
+                                    (ngModelChange)="onDepartamentoChange()">
+                                    <option value="">Seleccione un departamento</option>
+                                    <option *ngFor="let dep of departamentos" [value]="dep.code">{{ dep.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Provincia *</label>
+                                <select class="form-control" [(ngModel)]="usuario.provinciaCode" name="provinciaCode"
+                                    (ngModelChange)="onProvinciaChange()" [disabled]="!usuario.departamentoCode">
+                                    <option value="">{{ usuario.departamentoCode ? 'Seleccione una provincia' : 'Seleccione un departamento primero' }}</option>
+                                    <option *ngFor="let prov of provincias" [value]="prov.code">{{ prov.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Distrito *</label>
+                                <select class="form-control" [(ngModel)]="usuario.distritoCode" name="distritoCode"
+                                    [disabled]="!usuario.provinciaCode">
+                                    <option value="">{{ usuario.provinciaCode ? 'Seleccione un distrito' : 'Seleccione una provincia primero' }}</option>
+                                    <option *ngFor="let dist of distritos" [value]="dist.code">{{ dist.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dirección *</label>
+                                <input type="text" class="form-control" [(ngModel)]="usuario.calle" name="calle"
+                                    placeholder="Dirección">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Referencia</label>
+                                <input type="text" class="form-control" [(ngModel)]="usuario.referencia"
+                                    name="referencia" placeholder="Referencia">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-success" [disabled]="cargando">
+                            <i class="bi bi-save me-1"></i>{{ cargando ? 'ACTUALIZANDO...' : 'Actualizar Usuario' }}
+                        </button>
+                        <button type="button" class="btn btn-secondary" (click)="cancelarEdicion()">
+                            <i class="bi bi-x-circle me-1"></i>Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

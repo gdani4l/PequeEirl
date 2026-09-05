@@ -1,0 +1,20 @@
+<div class="confirm-modal" [class.show]="visible" [style.display]="visible ? 'flex' : 'none'">
+    <div class="confirm-modal-overlay" (click)="cancelar()"></div>
+    <div class="confirm-modal-container">
+        <div class="confirm-modal-icon">
+            <i class="bi bi-question-circle-fill"></i>
+        </div>
+        <div class="confirm-modal-content">
+            <h3 class="confirm-modal-title">{{ titulo }}</h3>
+            <p class="confirm-modal-message">{{ mensaje }}</p>
+        </div>
+        <div class="confirm-modal-buttons">
+            <button class="confirm-modal-btn confirm-modal-btn-cancel" (click)="cancelar()">
+                <i class="bi bi-x-lg me-1"></i>{{ textoNo }}
+            </button>
+            <button class="confirm-modal-btn confirm-modal-btn-confirm" (click)="confirmar()">
+                <i class="bi bi-check-lg me-1"></i>{{ textoSi }}
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,265 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e293b;
+}
+
+.registro-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 2rem;
+}
+
+.registro-card {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 1000px;
+    padding: 2.5rem;
+}
+
+.registro-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.registro-header i {
+    font-size: 2.5rem;
+    color: #2563eb;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.registro-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.registro-header p {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0.25rem 0 0;
+}
+
+.registro-body .form-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.registro-body .input-wrapper {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    background: #f8fafc;
+    border: 1px solid #dbeafe;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.registro-body .input-wrapper:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.1);
+}
+
+.registro-body .input-wrapper input,
+.registro-body .input-wrapper select {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    color: #1e293b;
+    outline: none;
+    min-width: 0;
+}
+
+.registro-body .input-wrapper input::placeholder {
+    color: #94a3b8;
+}
+
+.registro-body .input-wrapper select {
+    appearance: none;
+    cursor: pointer;
+}
+
+.registro-body .input-wrapper select option {
+    background: #ffffff;
+    color: #1e293b;
+}
+
+.registro-body .input-wrapper .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1rem;
+    color: #94a3b8;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-left: 1px solid #dbeafe;
+    flex-shrink: 0;
+}
+
+.registro-body .input-wrapper .icon:hover {
+    color: #2563eb;
+}
+
+.registro-body .input-wrapper .btn-buscar {
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-left: 1px solid #dbeafe;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.registro-body .input-wrapper .btn-buscar:hover {
+    background: #1d4ed8;
+}
+
+.registro-body .input-wrapper .btn-buscar:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.registro-body .row-custom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.registro-body .col-custom {
+    flex: 1;
+    min-width: calc(33.33% - 0.75rem);
+}
+
+.registro-body .col-custom-full {
+    flex: 1;
+    min-width: 100%;
+}
+
+.registro-body .btn-submit {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 0.75rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+.registro-body .btn-submit:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+    transform: translateY(-2px);
+}
+
+.registro-body .btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.registro-body .alert-custom {
+    border-radius: 0.75rem;
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.registro-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.registro-footer a {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+}
+
+.registro-footer a:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .registro-card {
+        padding: 1.5rem;
+        max-width: 100%;
+    }
+
+    .registro-body .col-custom {
+        min-width: calc(50% - 0.75rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .registro-card {
+        padding: 1rem;
+    }
+
+    .registro-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .registro-body .col-custom {
+        min-width: 100%;
+    }
+
+    .registro-body .input-wrapper input,
+    .registro-body .input-wrapper select {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .registro-body .btn-submit {
+        font-size: 0.8rem;
+        padding: 0.7rem;
+    }
+}

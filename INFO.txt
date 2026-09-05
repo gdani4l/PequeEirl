@@ -1,0 +1,20 @@
+-ADMIN
+
+correo: gdani4l981@gmail.com
+contraseña: admin
+
+-VENDEDOR
+
+correo: daniel@daniel.com
+contraseña: daniel
+
+dada@gmail.com
+asdfghjkl
+
+
+
+Tarjeta de prueba
+
+4474 1183 5563 2240
+03/2028
+111

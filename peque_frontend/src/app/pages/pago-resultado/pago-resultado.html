@@ -1,0 +1,42 @@
+<div class="resultado-container">
+    <div class="resultado-card" [ngClass]="{
+        'aprobado': estado === 'aprobado',
+        'rechazado': estado === 'rechazado',
+        'error': estado === 'error' || estado === 'timeout'
+    }">
+        <div class="resultado-icono">
+            <i *ngIf="estado === 'aprobado'" class="bi bi-check-circle-fill"></i>
+            <i *ngIf="estado === 'rechazado'" class="bi bi-x-circle-fill"></i>
+            <i *ngIf="estado === 'error' || estado === 'timeout'" class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+
+        <h2 *ngIf="estado === 'aprobado'">¡Pago aprobado!</h2>
+        <h2 *ngIf="estado === 'rechazado'">Pago rechazado</h2>
+        <h2 *ngIf="estado === 'timeout'">Tiempo agotado</h2>
+        <h2 *ngIf="estado === 'error'">Ocurrió un problema</h2>
+
+        <div class="resultado-detalle" *ngIf="estado === 'aprobado'">
+            <div class="detalle-linea" *ngIf="serie && numero">
+                <span>Comprobante:</span>
+                <strong>{{ serie }}-{{ numero }}</strong>
+            </div>
+            <div class="detalle-linea" *ngIf="monto">
+                <span>Monto pagado:</span>
+                <strong>S/ {{ monto }}</strong>
+            </div>
+            <div class="detalle-linea" *ngIf="tarjeta">
+                <span>Tarjeta:</span>
+                <strong>{{ marca }} {{ tarjeta }}</strong>
+            </div>
+            <p class="detalle-nota">La venta fue registrada correctamente en el sistema.</p>
+        </div>
+
+        <p class="resultado-mensaje" *ngIf="estado !== 'aprobado' && descripcion">{{ descripcion }}</p>
+        <p class="resultado-mensaje" *ngIf="estado === 'timeout'">El formulario de pago expiró. Vuelve a intentarlo.</p>
+        <p class="resultado-mensaje" *ngIf="estado === 'rechazado' && !descripcion">La transacción no fue aprobada. No se registró ninguna venta.</p>
+
+        <button class="btn-volver" (click)="volver()">
+            <i class="bi bi-arrow-left"></i> Volver al punto de venta
+        </button>
+    </div>
+</div>

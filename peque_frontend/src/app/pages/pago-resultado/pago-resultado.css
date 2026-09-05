@@ -1,0 +1,101 @@
+.resultado-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f2f8;
+    padding: 1.5rem;
+}
+
+.resultado-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2.5rem 3rem;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border-top: 6px solid #94a3b8;
+}
+
+.resultado-card.aprobado {
+    border-top-color: #10b981;
+}
+
+.resultado-card.rechazado {
+    border-top-color: #ef4444;
+}
+
+.resultado-card.error {
+    border-top-color: #f59e0b;
+}
+
+.resultado-icono {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.aprobado .resultado-icono {
+    color: #10b981;
+}
+
+.rechazado .resultado-icono {
+    color: #ef4444;
+}
+
+.error .resultado-icono {
+    color: #f59e0b;
+}
+
+.resultado-card h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+}
+
+.resultado-detalle {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.detalle-linea {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #475569;
+    padding: 0.3rem 0;
+}
+
+.detalle-nota {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+}
+
+.resultado-mensaje {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+}
+
+.btn-volver {
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.65rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-volver:hover {
+    background: #1d4ed8;
+}

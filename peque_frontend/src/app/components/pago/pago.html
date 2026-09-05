@@ -1,0 +1,159 @@
+<div class="pago-container">
+    <div class="pago-header">
+        <button class="btn-volver" (click)="volverALista()">
+            <i class="bi bi-arrow-left"></i> Volver
+        </button>
+        <h2><i class="bi bi-credit-card"></i> Finalizar Venta</h2>
+    </div>
+
+    <div class="pago-grid">
+        <div class="pago-resumen">
+            <h4>Resumen de Productos</h4>
+            <div class="tabla-resumen">
+                <div class="resumen-header">
+                    <span>Producto</span>
+                    <span>Presentación</span>
+                    <span>Cant.</span>
+                    <span>Precio S/</span>
+                </div>
+                <div class="resumen-item" *ngFor="let item of listaVenta">
+                    <span>{{ item.nombre }}</span>
+                    <span>{{ item.presentacion }}</span>
+                    <span>{{ item.cantidad }}</span>
+                    <span>S/ {{ item.precio_unitario | number:'1.2-2' }}</span>
+                </div>
+                <div class="resumen-total" *ngIf="listaVenta.length > 0">
+                    <span>Sub-total:</span>
+                    <span>S/ {{ subtotal | number:'1.2-2' }}</span>
+                </div>
+                <div class="resumen-vacio" *ngIf="listaVenta.length === 0">
+                    <i class="bi bi-cart"></i>
+                    <p>No hay productos en la venta</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pago-derecha">
+            <div class="pago-section">
+                <label class="pago-label">Tipo de Comprobante</label>
+                <div class="pago-opciones">
+                    <button class="pago-btn" [class.active]="tipoComprobante === 'BOLETA'" (click)="tipoComprobante = 'BOLETA'">
+                        Boleta
+                    </button>
+                    <button class="pago-btn" [class.active]="tipoComprobante === 'FACTURA'" (click)="tipoComprobante = 'FACTURA'">
+                        Factura
+                    </button>
+                </div>
+            </div>
+
+            <div class="cliente-section" *ngIf="tipoComprobante === 'FACTURA'">
+                <div class="cliente-row">
+                    <label>RUC</label>
+                    <div class="input-group">
+                        <input type="text" [(ngModel)]="clienteRUC" (input)="restringirRuc()" inputmode="numeric" maxlength="11" placeholder="RUC" [disabled]="buscando">
+                        <button class="btn-buscar" (click)="buscarClienteRUC()" [disabled]="buscando">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="cliente-row">
+                    <label>Razón Social</label>
+                    <input type="text" [(ngModel)]="clienteRazonSocial" placeholder="Razón Social">
+                </div>
+            </div>
+
+            <div class="cliente-section" *ngIf="tipoComprobante === 'BOLETA'">
+                <div class="cliente-row">
+                    <label>DNI</label>
+                    <div class="input-group">
+                        <input type="text" [(ngModel)]="clienteDNI" (input)="restringirDni()" inputmode="numeric" maxlength="8" placeholder="DNI" [disabled]="buscando">
+                        <button class="btn-buscar" (click)="buscarClienteDNI()" [disabled]="buscando || !clienteDNI">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="cliente-row">
+                    <label>Cliente</label>
+                    <input type="text" [(ngModel)]="clienteNombreCompleto" placeholder="Cliente">
+                </div>
+            </div>
+
+            <div class="cliente-section">
+                <div class="cliente-row">
+                    <label>Correo Electrónico *</label>
+                    <input type="email" [(ngModel)]="clienteEmail" placeholder="Correo Electrónico" required>
+                    <small class="email-nota">El comprobante se enviará a este correo</small>
+                </div>
+            </div>
+
+            <div class="pago-section">
+                <label class="pago-label">Método de Pago</label>
+                <div class="pago-opciones">
+                    <button class="pago-btn" [class.active]="metodoPago === 'EFECTIVO'" (click)="metodoPago = 'EFECTIVO'">
+                        <i class="bi bi-cash"></i> Efectivo
+                    </button>
+                    <button class="pago-btn" [class.active]="metodoPago === 'TARJETA'" (click)="metodoPago = 'TARJETA'">
+                        <i class="bi bi-credit-card"></i> Tarjeta
+                    </button>
+                    <button class="pago-btn" [class.active]="metodoPago === 'YAPE'" (click)="metodoPago = 'YAPE'">
+                        <i class="bi bi-qr-code"></i> Yape QR
+                    </button>
+                </div>
+            </div>
+
+            <div class="vuelto-section" *ngIf="metodoPago === 'EFECTIVO'">
+                <div class="vuelto-row">
+                    <label>Efectivo Recibido</label>
+                    <input type="number" [(ngModel)]="efectivoRecibido" placeholder="0.00">
+                </div>
+                <div class="vuelto-row">
+                    <label>Vuelto a Entregar</label>
+                    <span class="vuelto-monto" [class.calculado]="vueltoCalculado">
+                        {{ vueltoCalculado ? ('S/ ' + (vuelto | number:'1.2-2')) : 'Pendiente' }}
+                    </span>
+                    <button class="btn-calcular" (click)="calcularVuelto()" [disabled]="efectivoRecibido < total">
+                        <i class="bi bi-calculator"></i> Calcular
+                    </button>
+                    <button class="btn-reiniciar" (click)="reiniciarVuelto()">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="totales">
+                <div class="total-linea">
+                    <span>Sub-total:</span>
+                    <span>S/ {{ subtotal | number:'1.2-2' }}</span>
+                </div>
+                <div class="total-linea">
+                    <span>IGV (18%):</span>
+                    <span class="text-danger">S/ {{ igv | number:'1.2-2' }}</span>
+                </div>
+                <div class="total-linea total-final">
+                    <span>TOTAL A PAGAR:</span>
+                    <span class="total-valor">S/ {{ total | number:'1.2-2' }}</span>
+                </div>
+            </div>
+
+            <button class="btn-pagar" (click)="confirmarPago()" [disabled]="procesando">
+                <i [class]="metodoPago === 'EFECTIVO' ? 'bi bi-cash' : 'bi bi-qr-code'"></i>
+                {{ metodoPago === 'EFECTIVO' ? 'Finalizar Compra' : 'Generar QR de Pago' }}
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<div class="qr-overlay" *ngIf="qrVisible" (click)="cancelarQr()">
+    <div class="qr-box" (click)="$event.stopPropagation()">
+        <h3><i class="bi bi-qr-code"></i> {{ qrTipo === 'tarjeta' ? 'Pago con Tarjeta' : 'Pago con Yape QR' }}</h3>
+        <p class="qr-monto">S/ {{ total | number:'1.2-2' }}</p>
+        <img class="qr-imagen" [src]="qrDataUrl" alt="Código QR de pago">
+        <p class="qr-instruccion" *ngIf="qrTipo === 'yape'">Escanea el código con la cámara del celular</p>
+        <p class="qr-instruccion" *ngIf="qrTipo === 'tarjeta'">Escanea el código con la cámara del celular</p>
+        <div class="qr-esperando">
+            <span class="qr-spinner"></span> Esperando el pago del cliente...
+        </div>
+        <button class="qr-cancelar" (click)="cancelarQr()">Cancelar</button>
+    </div>
+</div>

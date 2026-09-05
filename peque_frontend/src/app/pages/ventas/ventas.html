@@ -1,0 +1,135 @@
+<div class="ventas-container" *ngIf="!mostrarPago">
+    <div class="ventas-grid">
+
+        <div class="ventas-productos">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-search"></i> Buscar Productos
+                </div>
+                <div class="card-body">
+                    <div class="filtros">
+                        <input type="text" class="filtro-input" [(ngModel)]="filtro.nombre" (input)="onFiltroChange()"
+                            placeholder="Buscar por nombre...">
+                        <select class="filtro-select" [(ngModel)]="filtro.id_categoria"
+                            (ngModelChange)="onFiltroChange()">
+                            <option [ngValue]="0">Todas las categorías</option>
+                            <option *ngFor="let cat of categorias" [ngValue]="cat.id_categoria">{{ cat.nombre }}</option>
+                        </select>
+                        <select class="filtro-select" [(ngModel)]="filtro.id_presentacion"
+                            (ngModelChange)="onFiltroChange()">
+                            <option [ngValue]="0">Todas las presentaciones</option>
+                            <option *ngFor="let pres of presentaciones" [ngValue]="pres.id_presentacion">{{ pres.nombre }}
+                            </option>
+                        </select>
+                        <button class="filtro-limpiar" (click)="limpiarFiltros()">
+                            <i class="bi bi-eraser"></i>
+                        </button>
+                    </div>
+
+                    <div class="tabla-wrapper">
+                        <table class="tabla-productos">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Present.</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Venc.</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let p of productosFiltrados"
+                                    [class.selected]="productoSeleccionado?.id_producto === p.id_producto"
+                                    (click)="seleccionarProducto(p)">
+                                    <td>{{ p.id_producto }}</td>
+                                    <td class="nombre">{{ p.nombre }}</td>
+                                    <td><span class="badge">{{ getCategoriaNombre(p) }}</span></td>
+                                    <td>{{ p.presentacion }}</td>
+                                    <td class="precio">S/ {{ p.precio_unitario | number:'1.2-2' }}</td>
+                                    <td class="stock">{{ p.stock }}</td>
+                                    <td class="vencimiento">{{ p.fecha_vencimiento | date:'dd/MM/yy' }}</td>
+                                    <td>
+                                        <button class="btn-add"
+                                            (click)="$event.stopPropagation(); seleccionarProducto(p)">
+                                            <i class="bi bi-cart-plus"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="productosFiltrados.length === 0">
+                                    <td colspan="8" class="text-center">No hay productos</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="selector" *ngIf="productoSeleccionado">
+                        <div class="selector-info">
+                            <strong>{{ productoSeleccionado.nombre }}</strong>
+                            <small>Stock: {{ productoSeleccionado.stock }}</small>
+                        </div>
+                        <div class="selector-control">
+                            <button (click)="cantidad = cantidad - 1" [disabled]="cantidad <= 1">-</button>
+                            <input type="number" [(ngModel)]="cantidad" (ngModelChange)="onCantidadChange()" min="1"
+                                [max]="productoSeleccionado.stock">
+                            <button (click)="cantidad = cantidad + 1"
+                                [disabled]="cantidad >= productoSeleccionado.stock">+</button>
+                            <span class="subtotal">S/ {{ (productoSeleccionado.precio_unitario * cantidad) |
+                                number:'1.2-2' }}</span>
+                            <button class="btn-agregar" (click)="agregarALista()">Agregar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ventas-carrito">
+            <div class="card">
+                <div class="card-header dark">
+                    <i class="bi bi-receipt"></i> Lista de Venta
+                    <span class="badge-count">{{ listaVenta.length }}</span>
+                </div>
+                <div class="card-body carrito-body">
+                    <div class="carrito-vacio" *ngIf="listaVenta.length === 0">
+                        <i class="bi bi-cart"></i>
+                        <p>No hay productos</p>
+                    </div>
+                    <div class="carrito-items" *ngIf="listaVenta.length > 0">
+                        <div class="carrito-item" *ngFor="let item of listaVenta; let i = index">
+                            <div class="item-info">
+                                <strong>{{ item.nombre }}</strong>
+                                <small>{{ item.presentacion }}</small>
+                            </div>
+                            <div class="item-cantidad">
+                                <button (click)="actualizarCantidad(item, item.cantidad - 1)"
+                                    [disabled]="item.cantidad <= 1">-</button>
+                                <span>{{ item.cantidad }}</span>
+                                <button (click)="actualizarCantidad(item, item.cantidad + 1)"
+                                    [disabled]="item.cantidad >= item.stock">+</button>
+                            </div>
+                            <div class="item-subtotal">S/ {{ (item.precio_unitario * item.cantidad) | number:'1.2-2' }}
+                            </div>
+                            <button class="item-delete" (click)="eliminarDeLista(i)"><i
+                                    class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="resumen"><span>Sub total:</span><span>S/ {{ subtotal | number:'1.2-2' }}</span></div>
+                    <div class="resumen"><span>IGV (18%):</span><span class="danger">S/ {{ igv | number:'1.2-2'
+                            }}</span></div>
+                    <div class="resumen total"><span>Total:</span><span class="total-valor">S/ {{ total | number:'1.2-2'
+                            }}</span></div>
+                    <button class="btn-pagar" (click)="irAPagar()"><i class="bi bi-credit-card"></i> Ir a pagar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<app-pago *ngIf="mostrarPago" [listaVenta]="listaVenta" [subtotal]="subtotal" [igv]="igv" [total]="total"
+    [idUsuario]="idUsuario" (volver)="mostrarPago = false" (pagoConfirmado)="confirmarPago($event)">
+</app-pago>

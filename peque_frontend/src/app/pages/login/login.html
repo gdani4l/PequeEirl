@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <h1>INICIAR SESIÓN</h1>
+            </div>
+            <div class="login-body" *ngIf="!mfaPendiente">
+                <div *ngIf="error" class="alert alert-danger alert-custom">{{ error }}</div>
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <input type="email" [(ngModel)]="correo" placeholder="Correo Electrónico">
+                        <span class="icon"><i class="bi bi-envelope"></i></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <div class="input-wrapper">
+                        <input id="login-password" type="password" [(ngModel)]="password" placeholder="********">
+                        <span class="icon" (click)="togglePassword()">
+                            <i id="login-toggle-icon" class="bi bi-eye-slash-fill"></i>
+                        </span>
+                    </div>
+                </div>
+                <button class="btn-submit" (click)="login()" [disabled]="loading">
+                    {{ loading ? 'ENVIANDO CÓDIGO...' : 'INGRESAR' }}
+                </button>
+                <div class="login-footer">
+                    <a routerLink="/registro">¿No tienes cuenta? Regístrate aquí</a>
+                </div>
+            </div>
+            <div class="login-body" *ngIf="mfaPendiente">
+                <div class="form-group">
+                    <label class="form-label">Código de Verificación</label>
+                    <p style="font-size: 0.85rem; color: #64748b;">
+                        Enviamos un código de 6 dígitos a <strong>{{ correo }}</strong>. Expira en 5 minutos.
+                    </p>
+                    <div class="input-wrapper">
+                        <input type="text" [(ngModel)]="codigoMfa" (input)="restringirCodigoMfa()"
+                            inputmode="numeric" maxlength="6" placeholder="000000"
+                            style="letter-spacing: 6px; text-align: center; font-size: 1.2rem;">
+                        <span class="icon"><i class="bi bi-shield-lock"></i></span>
+                    </div>
+                </div>
+                <button class="btn-submit" (click)="verificarCodigo()" [disabled]="loading">
+                    {{ loading ? 'VERIFICANDO...' : 'VERIFICAR CÓDIGO' }}
+                </button>
+                <div class="login-footer">
+                    <a href="javascript:void(0)" (click)="volverAlLogin()">Volver al inicio de sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
